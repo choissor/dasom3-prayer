@@ -293,7 +293,7 @@ async function loadFromNotion(){
   // Notion은 백그라운드에서 불러옴
   try{
     const res=await notionRequest(`databases/${NOTION_DB_ID}/query`,'POST',{
-      filter:{property:'Name',title:{equals:'app_data'}},page_size:1
+      filter:{property:'이름',title:{equals:'app_data'}},page_size:1
     });
     if(!res.results)throw new Error('fail');
     const page=res.results[0];
@@ -341,7 +341,7 @@ async function _saveToNotion(){
     for(let i=0;i<data.length;i+=2000)chunks.push(data.slice(i,i+2000));
     const blocks=chunks.map(c=>({object:'block',type:'paragraph',paragraph:{rich_text:[{type:'text',text:{content:c}}]}}));
     const res=await notionRequest(`databases/${NOTION_DB_ID}/query`,'POST',{
-      filter:{property:'Name',title:{equals:'app_data'}},page_size:1
+      filter:{property:'이름',title:{equals:'app_data'}},page_size:1
     });
     const existing=res.results&&res.results[0];
     if(existing){
@@ -355,7 +355,7 @@ async function _saveToNotion(){
     }else{
       const page=await notionRequest('pages','POST',{
         parent:{database_id:NOTION_DB_ID},
-        properties:{Name:{title:[{text:{content:'app_data'}}]}}
+        properties:{'이름':{title:[{text:{content:'app_data'}}]}}
       });
       await notionRequest(`blocks/${page.id}/children`,'PATCH',{children:blocks});
     }
@@ -616,11 +616,23 @@ function renderMembers(){
   }).join('');
 }
 
-function getInitials(n){const sep=['·','&',' '].find(s=>n.includes(s));if(sep){const p=n.split(sep);if(p.length>=2)return p[0].trim()[0]+sep+p[1].trim()[0];}return n.slice(0,2);}
-  const name=document.getElementById('new-couple').value.trim();if(!name)return;
+function getInitials(n){
+  const sep=['·','&',' '].find(s=>n.includes(s));
+  if(sep){
+    const p=n.split(sep);
+    if(p.length>=2) return p[0].trim()[0]+sep+p[1].trim()[0];
+  }
+  return n.slice(0,2);
+}
+
+function addCouple(){
+  const name=document.getElementById('new-couple').value.trim();
+  if(!name) return;
   const initials=getInitials(name);
   couples.push({id:Date.now(),name,initials,isLeader:false,pw:''});
-  document.getElementById('new-couple').value='';saveToNotion();renderMembers();
+  document.getElementById('new-couple').value='';
+  saveToNotion();
+  renderMembers();
 }
 function goTab(name,el){
   ['write','history','members'].forEach(t=>{document.getElementById(`pg-${t}`).style.display=t===name?'':'none';});
