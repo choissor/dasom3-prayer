@@ -134,6 +134,25 @@ body{font-family:var(--font-sans);background:#f5f5f0;min-height:100vh;display:fl
 .reset-link{font-size:11px;color:#0F6E56;background:none;border:none;cursor:pointer;text-decoration:underline;display:block;text-align:center;margin-bottom:12px;padding:2px}
 .pw-modal-cancel{width:100%;padding:11px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:none;color:var(--color-text-secondary);cursor:pointer}
 .loading{text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:13px}
+
+.flow-box{background:linear-gradient(180deg,#FBFDFB 0%,#F6FAF7 100%);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;margin-bottom:1rem}
+.flow-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.flow-title{font-size:13px;font-weight:600;color:#0F6E56;display:flex;align-items:center;gap:5px}
+.flow-sub{font-size:11px;color:var(--color-text-tertiary);line-height:1.5;margin-bottom:10px}
+.month-bar{display:flex;align-items:center;justify-content:space-between;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 10px;margin-bottom:10px}
+.month-lbl{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.flow-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:8px}
+.flow-couple{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.flow-couple-name{font-size:13px;font-weight:500;color:var(--color-text-primary);display:flex;align-items:center;gap:8px}
+.flow-toggle{font-size:11px;color:#0F6E56;border:0.5px solid #5DCAA5;background:none;border-radius:20px;padding:3px 9px;cursor:pointer}
+.flow-timeline{display:none;margin-top:10px;border-left:1.5px solid #CBEBDD;padding-left:12px}
+.flow-week{position:relative;margin-bottom:12px}
+.flow-week:last-child{margin-bottom:0}
+.flow-week:before{content:'';position:absolute;left:-17px;top:3px;width:8px;height:8px;border-radius:50%;background:#5DCAA5;border:2px solid #fff;box-shadow:0 0 0 1px #CBEBDD}
+.flow-week-title{font-size:12px;font-weight:600;color:#0F6E56;margin-bottom:4px}
+.flow-week-body{font-size:12px;color:var(--color-text-secondary);line-height:1.7}
+.flow-empty{font-size:12px;color:var(--color-text-tertiary);padding:4px 0}
+
 .sync-bar{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--color-text-tertiary);padding:6px;border-top:0.5px solid var(--color-border-tertiary);margin-top:1rem}
 </style>
 </head>
@@ -184,6 +203,19 @@ body{font-family:var(--font-sans);background:#f5f5f0;min-height:100vh;display:fl
       </div>
     </div>
     <p style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:12px">"변경 이력" 버튼을 누르면 비밀번호 확인 후 이력을 볼 수 있어요.</p>
+
+    <div class="flow-box">
+      <div class="flow-head">
+        <div class="flow-title"><i class="ti ti-sprout" style="font-size:14px"></i> 월별 기도의 흐름</div>
+      </div>
+      <div class="flow-sub">각 가정의 한 달 기도제목 변화를 주차별로 한눈에 볼 수 있어요.</div>
+      <div class="month-bar">
+        <button class="wbtn" onclick="chMonth(-1)"><i class="ti ti-chevron-left"></i></button>
+        <span class="month-lbl" id="month-lbl"></span>
+        <button class="wbtn" onclick="chMonth(1)"><i class="ti ti-chevron-right"></i></button>
+      </div>
+      <div id="monthly-flow"></div>
+    </div>
     <div id="hist-content"></div>
     <div style="margin-top:1rem">
       <button class="share-all-btn" onclick="toggleHistPanel()"><i class="ti ti-send"></i> 이 주차 전체 공유</button>
@@ -270,7 +302,7 @@ const NOTION_DB_ID='371c87312eaf80589af9d15fbfe4b704';
 const AV=[{bg:'#E1F5EE',c:'#085041'},{bg:'#EEEDFE',c:'#3C3489'},{bg:'#FAEEDA',c:'#633806'},{bg:'#FAECE7',c:'#712B13'},{bg:'#EAF3DE',c:'#27500A'}];
 let couples=[];
 let pdata={},changelog={};
-let wOff=0,hOff=0;
+let wOff=0,hOff=0,mOff=0;
 let pendingMemberDelete=null,pendingPrayerDelete=null;
 let debounceTimers={};
 const MAX_LOG=10;
@@ -376,6 +408,21 @@ function saveLocal(){try{localStorage.setItem('dasom3',JSON.stringify({couples,p
 function wKey(off){const d=new Date();d.setDate(d.getDate()+off*7);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-W${Math.ceil(d.getDate()/7)}`;}
 function wLabel(off){const d=new Date();d.setDate(d.getDate()+off*7);const days=['일','월','화','수','목','금','토'];return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;}
 function weekTitle(off){const d=new Date();d.setDate(d.getDate()+off*7);return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${Math.ceil(d.getDate()/7)}주차`;}
+
+function monthDate(off){const d=new Date();d.setMonth(d.getMonth()+off);d.setDate(1);return d;}
+function monthLabel(off){const d=monthDate(off);return `${d.getFullYear()}년 ${d.getMonth()+1}월`;}
+function weeksInMonth(off){
+  const base=monthDate(off);
+  const y=base.getFullYear();
+  const m=base.getMonth();
+  const last=new Date(y,m+1,0).getDate();
+  const arr=[];
+  for(let week=1;week<=Math.ceil(last/7);week++){
+    const day=Math.min((week-1)*7+1,last);
+    arr.push({key:`${y}-${String(m+1).padStart(2,'0')}-W${week}`,label:`${m+1}월 ${week}주차`,day});
+  }
+  return arr;
+}
 function tsLabel(ts){const d=new Date(ts);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function getLeaders(){return couples.filter(c=>c.isLeader);}
@@ -581,6 +628,50 @@ function renderCouples(){
   document.getElementById('all-panel').style.display='none';
 }
 
+
+function renderMonthlyFlow(){
+  const lbl=document.getElementById('month-lbl');
+  const box=document.getElementById('monthly-flow');
+  if(!lbl||!box)return;
+  lbl.textContent=monthLabel(mOff);
+  const weeks=weeksInMonth(mOff);
+
+  box.innerHTML=couples.map((c,i)=>{
+    const av=AV[i%AV.length];
+    const weekHtml=weeks.map(w=>{
+      const filled=getE(c.id,w.key).filter(x=>x.trim());
+      return `<div class="flow-week">
+        <div class="flow-week-title">${w.label}</div>
+        <div class="flow-week-body">${filled.length?filled.map((x,j)=>`${j+1}. ${esc(x)}`).join('<br>'):'<span style="color:#999">미입력</span>'}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="flow-card">
+      <div class="flow-couple" onclick="toggleMonthlyFlow(${c.id})">
+        <div class="flow-couple-name">
+          <div class="av" style="background:${av.bg};color:${av.c};width:28px;height:28px;font-size:10px">${c.initials}</div>
+          <span>${c.name}</span>
+        </div>
+        <button class="flow-toggle" type="button">보기</button>
+      </div>
+      <div class="flow-timeline" id="flow-${c.id}">
+        ${weekHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleMonthlyFlow(cid){
+  const el=document.getElementById(`flow-${cid}`);
+  if(!el)return;
+  el.style.display=el.style.display==='block'?'none':'block';
+}
+
+function chMonth(d){
+  mOff+=d;
+  renderMonthlyFlow();
+}
+
 function renderHistory(){
   document.getElementById('hwlbl').textContent=weekTitle(hOff);
   const key=wKey(hOff);
@@ -637,7 +728,7 @@ function addCouple(){
 function goTab(name,el){
   ['write','history','members'].forEach(t=>{document.getElementById(`pg-${t}`).style.display=t===name?'':'none';});
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
-  if(name==='history'){hOff=wOff;renderHistory();}
+  if(name==='history'){hOff=wOff;mOff=0;renderMonthlyFlow();renderHistory();}
   if(name==='members')renderMembers();
 }
 function chWeek(d){wOff+=d;renderCouples();}
