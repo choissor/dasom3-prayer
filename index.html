@@ -405,22 +405,88 @@ function setSyncText(t){const el=document.getElementById('sync-text');if(el)el.t
 function loadLocal(){try{const r=localStorage.getItem('dasom3');if(r){const p=JSON.parse(r);if(p.couples)couples=p.couples;if(p.pdata)pdata=p.pdata;if(p.changelog)changelog=p.changelog;}}catch(e){}}
 function saveLocal(){try{localStorage.setItem('dasom3',JSON.stringify({couples,pdata,changelog}));}catch(e){}}
 
-function wKey(off){const d=new Date();d.setDate(d.getDate()+off*7);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-W${Math.ceil(d.getDate()/7)}`;}
-function wLabel(off){const d=new Date();d.setDate(d.getDate()+off*7);const days=['일','월','화','수','목','금','토'];return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;}
-function weekTitle(off){const d=new Date();d.setDate(d.getDate()+off*7);return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${Math.ceil(d.getDate()/7)}주차`;}
+function getSunday(base=new Date()){
+  const d=new Date(base);
+  const day=d.getDay();
 
-function monthDate(off){const d=new Date();d.setMonth(d.getMonth()+off);d.setDate(1);return d;}
-function monthLabel(off){const d=monthDate(off);return `${d.getFullYear()}년 ${d.getMonth()+1}월`;}
+  // 일요일이면 그날을 기준으로, 월~토이면 직전 일요일을 기준으로 사용
+  if(day!==0){
+    d.setDate(d.getDate()-day);
+  }
+
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function weekKeyFromDate(date){
+  const sunday=getSunday(date);
+  return `${sunday.getFullYear()}-${String(sunday.getMonth()+1).padStart(2,'0')}-W${Math.ceil(sunday.getDate()/7)}`;
+}
+
+function weekLabelFromDate(date){
+  const sunday=getSunday(date);
+  const days=['일','월','화','수','목','금','토'];
+  return `${sunday.getFullYear()}년 ${sunday.getMonth()+1}월 ${sunday.getDate()}일 (${days[sunday.getDay()]})`;
+}
+
+function weekTitleFromDate(date){
+  const sunday=getSunday(date);
+  return `${sunday.getFullYear()}년 ${sunday.getMonth()+1}월 ${Math.ceil(sunday.getDate()/7)}주차`;
+}
+
+function sundayByOffset(off){
+  const d=getSunday();
+  d.setDate(d.getDate()+off*7);
+  return d;
+}
+
+function wKey(off){
+  return weekKeyFromDate(sundayByOffset(off));
+}
+
+function wLabel(off){
+  return weekLabelFromDate(sundayByOffset(off));
+}
+
+function weekTitle(off){
+  return weekTitleFromDate(sundayByOffset(off));
+}
+
+function monthDate(off){
+  // 현재 달이 아니라, 현재 적용 중인 '주일'이 속한 달을 기준으로 함
+  // 예: 6월 1일 월요일이라도 직전 주일이 5월 31일이면 5월로 표시
+  const base=getSunday();
+  base.setMonth(base.getMonth()+off);
+  base.setDate(1);
+  base.setHours(0,0,0,0);
+  return base;
+}
+
+function monthLabel(off){
+  const d=monthDate(off);
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월`;
+}
+
 function weeksInMonth(off){
   const base=monthDate(off);
   const y=base.getFullYear();
   const m=base.getMonth();
   const last=new Date(y,m+1,0).getDate();
   const arr=[];
-  for(let week=1;week<=Math.ceil(last/7);week++){
-    const day=Math.min((week-1)*7+1,last);
-    arr.push({key:`${y}-${String(m+1).padStart(2,'0')}-W${week}`,label:`${m+1}월 ${week}주차`,day});
+
+  // 해당 월 안에 있는 '일요일'만 주차로 표시
+  for(let day=1;day<=last;day++){
+    const d=new Date(y,m,day);
+    if(d.getDay()===0){
+      const week=Math.ceil(day/7);
+      arr.push({
+        key:weekKeyFromDate(d),
+        label:`${m+1}월 ${week}주차`,
+        day
+      });
+    }
   }
+
   return arr;
 }
 function tsLabel(ts){const d=new Date(ts);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
