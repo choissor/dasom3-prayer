@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>다솜빛마을 3조 기도제목</title>
+<meta name="description" content="다솜빛마을 3조 신혼부부 기도제목 나눔">
+<meta property="og:title" content="🙏 다솜빛마을 3조 기도제목">
+<meta property="og:description" content="신혼부부 패밀리 기도제목 나눔">
+<meta property="og:image" content="https://dasom3-prayer.vercel.app/og-image.png">
+<meta property="og:url" content="https://dasom3-prayer.vercel.app">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dasom3-prayer.vercel.app/og-image.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.9.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --color-background-primary:#fff;
+  --color-background-secondary:#f8f8f6;
+  --color-background-tertiary:#f1efe8;
+  --color-text-primary:#1a1a1a;
+  --color-text-secondary:#666;
+  --color-text-tertiary:#999;
+  --color-border-tertiary:rgba(0,0,0,0.1);
+  --color-border-secondary:rgba(0,0,0,0.2);
+  --border-radius-md:8px;
+  --border-radius-lg:12px;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'Courier New',monospace;
+}
+body{font-family:var(--font-sans);background:#f5f5f0;min-height:100vh;display:flex;justify-content:center;padding:0 0 2rem}
+.app{max-width:420px;width:100%;background:var(--color-background-primary);min-height:100vh}
+.hd{padding:1rem 1rem 0.75rem;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.hd-row{display:flex;align-items:center;justify-content:space-between}
+.hd-title{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.hd-badge{font-size:11px;background:#E1F5EE;color:#0F6E56;padding:3px 10px;border-radius:20px}
+.hd-sub{font-size:12px;color:var(--color-text-secondary);margin-top:3px}
+.hd-leader{display:flex;align-items:center;gap:5px;margin-top:5px}
+.leader-label{font-size:11px;color:var(--color-text-tertiary)}
+.leader-name{font-size:12px;font-weight:500;color:#0F6E56}
+.tabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);position:sticky;top:0;z-index:10}
+.tab{flex:1;padding:10px 0;font-size:13px;text-align:center;color:var(--color-text-secondary);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent}
+.tab.on{color:#0F6E56;border-bottom-color:#0F6E56;font-weight:500}
+.pg{padding:1rem}
+.week-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.week-lbl{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.wnav{display:flex;gap:6px}
+.wbtn{width:30px;height:30px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);cursor:pointer;color:var(--color-text-secondary);font-size:14px;display:flex;align-items:center;justify-content:center}
+.wbtn:hover{background:var(--color-background-secondary)}
+.couple-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1rem 0.75rem;margin-bottom:10px}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ch-left{display:flex;align-items:center;gap:10px}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.cname{font-size:14px;font-weight:500;color:var(--color-text-primary);display:flex;align-items:center}
+.cmeta{font-size:11px;color:var(--color-text-secondary)}
+.autosave-tag{font-size:11px;color:#0F6E56;display:none}
+.pitem{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.pnum{font-size:11px;color:var(--color-text-tertiary);min-width:16px}
+.pinput{flex:1;font-size:13px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 10px;background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans)}
+.pinput:focus{outline:none;border-color:#5DCAA5}
+.pdel{width:24px;height:24px;border:none;background:none;cursor:pointer;color:var(--color-text-tertiary);padding:0;display:flex;align-items:center;justify-content:center;border-radius:4px}
+.pdel:hover{color:#E24B4A;background:var(--color-background-secondary)}
+.padd{width:100%;padding:6px;font-size:12px;border:0.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-md);background:none;color:#0F6E56;cursor:pointer;margin-top:4px}
+.padd:hover{background:#E1F5EE}
+.card-footer{display:flex;align-items:center;justify-content:flex-end;margin-top:10px;gap:6px}
+.share-one-btn{padding:6px 12px;font-size:12px;border:0.5px solid #5DCAA5;border-radius:var(--border-radius-md);background:none;color:#0F6E56;cursor:pointer;display:flex;align-items:center;gap:4px}
+.share-one-btn:hover{background:#E1F5EE}
+.sbtn{padding:6px 14px;font-size:12px;background:#1D9E75;color:#fff;border:none;border-radius:var(--border-radius-md);cursor:pointer;font-weight:500}
+.sbtn:hover{background:#0F6E56}
+.inline-share{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;margin-top:8px;display:none}
+.inline-pre{font-size:12px;color:var(--color-text-secondary);line-height:1.75;white-space:pre-wrap;font-family:var(--font-mono)}
+.inline-actions{display:flex;gap:6px;margin-top:8px}
+.copy-btn{flex:1;padding:7px;font-size:12px;border:0.5px solid #5DCAA5;border-radius:var(--border-radius-md);background:none;color:#0F6E56;cursor:pointer;font-weight:500}
+.copy-btn:hover{background:#E1F5EE}
+.close-sm{padding:7px 12px;font-size:12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:none;color:var(--color-text-secondary);cursor:pointer}
+.share-all-btn{width:100%;padding:9px;font-size:13px;border:0.5px solid #5DCAA5;border-radius:var(--border-radius-lg);background:none;color:#0F6E56;cursor:pointer;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:0.25rem}
+.share-all-btn:hover{background:#E1F5EE}
+.share-all-panel{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;margin-top:0.75rem;display:none}
+.share-pre{font-size:12px;color:var(--color-text-secondary);line-height:1.75;white-space:pre-wrap;font-family:var(--font-mono)}
+.copy-row{display:flex;gap:8px;margin-top:10px}
+.hw-section{margin-bottom:1.25rem}
+.hw-couple-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.hw-couple-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.hw-prayers{font-size:13px;color:var(--color-text-secondary);line-height:1.7;padding-left:4px}
+.history-btn{font-size:11px;padding:3px 10px;border:0.5px solid var(--color-border-secondary);border-radius:20px;background:none;color:var(--color-text-secondary);cursor:pointer;display:flex;align-items:center;gap:4px}
+.history-btn:hover{background:var(--color-background-secondary)}
+.hist-log{margin-top:8px;display:none;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;border:0.5px solid var(--color-border-tertiary)}
+.hist-log-title{font-size:11px;color:var(--color-text-tertiary);margin-bottom:8px;font-weight:500}
+.log-entry{padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.log-entry:last-child{border-bottom:none}
+.log-time{font-size:11px;color:var(--color-text-tertiary);margin-bottom:4px}
+.log-content{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.restore-btn{font-size:11px;padding:3px 9px;border:0.5px solid #5DCAA5;border-radius:20px;background:none;color:#0F6E56;cursor:pointer;margin-top:5px}
+.restore-btn:hover{background:#E1F5EE}
+.member-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.mi{display:flex;align-items:center;gap:10px}
+.delbtn{border:none;background:none;cursor:pointer;color:var(--color-text-tertiary)}
+.delbtn:hover{color:#E24B4A}
+.leader-toggle{font-size:11px;padding:4px 10px;border-radius:20px;border:0.5px solid;cursor:pointer;font-weight:500}
+.leader-toggle.is-leader{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5}
+.leader-toggle.not-leader{background:none;color:var(--color-text-tertiary);border-color:var(--color-border-secondary)}
+.leader-toggle.is-leader:hover{background:#9FE1CB}
+.leader-toggle.not-leader:hover{background:var(--color-background-secondary)}
+.member-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pw-set-btn{font-size:11px;padding:4px 10px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:none;color:var(--color-text-tertiary);cursor:pointer}
+.pw-set-btn.has-pw{color:#0F6E56;border-color:#5DCAA5;background:#E1F5EE}
+.add-form{margin-top:1rem;display:flex;flex-direction:column;gap:8px}
+.add-form input{font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px 10px;background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans)}
+.add-form button{padding:9px;font-size:13px;background:#1D9E75;color:#fff;border:none;border-radius:var(--border-radius-md);cursor:pointer;font-weight:500}
+.master-info{background:#FAEEDA;border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:1rem;font-size:12px;color:#633806;line-height:1.6}
+.confirm-overlay{display:none;min-height:180px;background:rgba(0,0,0,0.4);border-radius:var(--border-radius-lg);margin-top:8px;align-items:center;justify-content:center;padding:1rem}
+.confirm-overlay.show{display:flex}
+.confirm-box{background:var(--color-background-primary);border-radius:var(--border-radius-lg);padding:1.25rem;width:100%;max-width:280px;border:0.5px solid var(--color-border-tertiary)}
+.confirm-title{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.confirm-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:14px}
+.confirm-highlight{font-weight:500;color:#E24B4A}
+.confirm-btns{display:flex;gap:8px}
+.confirm-cancel{flex:1;padding:9px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:none;color:var(--color-text-secondary);cursor:pointer}
+.confirm-del{flex:1;padding:9px;font-size:13px;border:none;border-radius:var(--border-radius-md);background:#E24B4A;color:#fff;cursor:pointer;font-weight:500}
+.pw-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:flex-end;justify-content:center}
+.pw-modal-bg.show{display:flex}
+.pw-modal{background:var(--color-background-primary);border-radius:16px 16px 0 0;padding:1.5rem 1.25rem;width:100%;max-width:420px}
+.pw-modal-title{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;text-align:center}
+.pw-modal-sub{font-size:12px;color:var(--color-text-secondary);margin-bottom:16px;line-height:1.5;text-align:center}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:12px}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--color-border-secondary);background:none;transition:all .15s}
+.pin-dot.filled{background:#1D9E75;border-color:#1D9E75}
+.pw-modal-err{font-size:11px;color:#E24B4A;min-height:16px;margin-bottom:10px;text-align:center}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.pin-btn{padding:14px 0;font-size:20px;font-weight:500;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);background:var(--color-background-secondary);color:var(--color-text-primary);cursor:pointer;text-align:center}
+.pin-btn:active{transform:scale(0.95);background:#E1F5EE}
+.pin-del-btn{padding:14px 0;font-size:18px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);background:none;color:var(--color-text-secondary);cursor:pointer;grid-column:3}
+.reset-link{font-size:11px;color:#0F6E56;background:none;border:none;cursor:pointer;text-decoration:underline;display:block;text-align:center;margin-bottom:12px;padding:2px}
+.pw-modal-cancel{width:100%;padding:11px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:none;color:var(--color-text-secondary);cursor:pointer}
+.loading{text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:13px}
+.sync-bar{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--color-text-tertiary);padding:6px;border-top:0.5px solid var(--color-border-tertiary);margin-top:1rem}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hd">
+    <div class="hd-row"><span class="hd-title">🙏 다솜빛마을 3조</span><span class="hd-badge">패밀리</span></div>
+    <div class="hd-sub">신혼부부 기도제목 나눔</div>
+    <div class="hd-leader" id="leader-display"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" onclick="goTab('write',this)">기도제목 입력</button>
+    <button class="tab" onclick="goTab('history',this)">기록 보기</button>
+    <button class="tab" onclick="goTab('members',this)">가정 관리</button>
+  </div>
+
+  <div id="pg-write" class="pg">
+    <div class="week-bar">
+      <span class="week-lbl" id="wlbl"></span>
+      <div class="wnav">
+        <button class="wbtn" onclick="chWeek(-1)"><i class="ti ti-chevron-left"></i></button>
+        <button class="wbtn" onclick="chWeek(1)"><i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+    <div id="couple-list"><div class="loading"><i class="ti ti-loader" style="font-size:20px"></i><br>불러오는 중...</div></div>
+    <button style="width:100%;padding:10px;border:0.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-lg);background:none;font-size:13px;color:var(--color-text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px" onclick="goTab('members',document.querySelectorAll('.tab')[2])">
+      <i class="ti ti-plus"></i> 가정 추가하러 가기
+    </button>
+    <div style="margin-top:1rem">
+      <button class="share-all-btn" onclick="toggleAllPanel()"><i class="ti ti-send"></i> 전체 가정 기도제목 공유</button>
+      <div class="share-all-panel" id="all-panel">
+        <div class="share-pre" id="all-pre"></div>
+        <div class="copy-row">
+          <button class="copy-btn" id="all-copy-btn" onclick="copyPanel('all-pre','all-copy-btn')"><i class="ti ti-copy" style="font-size:13px;vertical-align:-1px"></i> 복사하기</button>
+          <button class="close-sm" onclick="document.getElementById('all-panel').style.display='none'">닫기</button>
+        </div>
+      </div>
+    </div>
+    <div class="sync-bar" id="sync-bar"><i class="ti ti-cloud" style="font-size:13px"></i> <span id="sync-text">Notion 연동중...</span></div>
+  </div>
+
+  <div id="pg-history" class="pg" style="display:none">
+    <div class="week-bar">
+      <span class="week-lbl" id="hwlbl"></span>
+      <div class="wnav">
+        <button class="wbtn" onclick="chHWeek(-1)"><i class="ti ti-chevron-left"></i></button>
+        <button class="wbtn" onclick="chHWeek(1)"><i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:12px">"변경 이력" 버튼을 누르면 비밀번호 확인 후 이력을 볼 수 있어요.</p>
+    <div id="hist-content"></div>
+    <div style="margin-top:1rem">
+      <button class="share-all-btn" onclick="toggleHistPanel()"><i class="ti ti-send"></i> 이 주차 전체 공유</button>
+      <div class="share-all-panel" id="hist-panel">
+        <div class="share-pre" id="hist-pre"></div>
+        <div class="copy-row">
+          <button class="copy-btn" id="hist-copy-btn" onclick="copyPanel('hist-pre','hist-copy-btn')"><i class="ti ti-copy" style="font-size:13px;vertical-align:-1px"></i> 복사하기</button>
+          <button class="close-sm" onclick="document.getElementById('hist-panel').style.display='none'">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pg-members" class="pg" style="display:none">
+    <div class="master-info">
+      <i class="ti ti-shield-lock" style="font-size:13px;vertical-align:-2px"></i>
+      <strong>마스터 비밀번호</strong>로 분실된 가정 비밀번호를 초기화할 수 있어요. 리더 인수인계 시 구두로 전달해 주세요.
+    </div>
+    <div id="member-list"></div>
+    <div class="confirm-overlay" id="member-confirm">
+      <div class="confirm-box">
+        <div class="confirm-title"><i class="ti ti-alert-triangle" style="font-size:15px;vertical-align:-2px;color:#E24B4A"></i> 가정을 삭제할까요?</div>
+        <div class="confirm-desc"><span class="confirm-highlight" id="member-confirm-name"></span>을(를) 삭제하면 해당 가정의 모든 기도제목 기록도 함께 사라져요.</div>
+        <div class="confirm-btns">
+          <button class="confirm-cancel" onclick="cancelMemberDelete()">취소</button>
+          <button class="confirm-del" onclick="confirmMemberDelete()">삭제하기</button>
+        </div>
+      </div>
+    </div>
+    <div class="add-form">
+      <input id="new-couple" type="text" placeholder="예) 김민준·이지은 가정">
+      <button onclick="addCouple()"><i class="ti ti-user-plus" style="font-size:14px;vertical-align:-2px"></i> 가정 추가</button>
+    </div>
+  </div>
+</div>
+
+<div style="display:none" id="prayer-confirm-wrap">
+  <div class="confirm-overlay show" style="margin-top:0">
+    <div class="confirm-box">
+      <div class="confirm-title"><i class="ti ti-alert-triangle" style="font-size:15px;vertical-align:-2px;color:#E24B4A"></i> 기도제목을 삭제할까요?</div>
+      <div class="confirm-desc" id="prayer-confirm-desc"></div>
+      <div class="confirm-btns">
+        <button class="confirm-cancel" onclick="cancelPrayerDelete()">취소</button>
+        <button class="confirm-del" onclick="confirmPrayerDelete()">삭제하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pw-modal-bg" id="pw-modal">
+  <div class="pw-modal">
+    <div class="pw-modal-title" id="pw-modal-title"></div>
+    <div class="pw-modal-sub" id="pw-modal-sub"></div>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot" id="dot-0"></div>
+      <div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div>
+      <div class="pin-dot" id="dot-3"></div>
+    </div>
+    <div class="pw-modal-err" id="pw-modal-err"></div>
+    <div class="pin-pad">
+      <button class="pin-btn" onclick="pinInput('1')">1</button>
+      <button class="pin-btn" onclick="pinInput('2')">2</button>
+      <button class="pin-btn" onclick="pinInput('3')">3</button>
+      <button class="pin-btn" onclick="pinInput('4')">4</button>
+      <button class="pin-btn" onclick="pinInput('5')">5</button>
+      <button class="pin-btn" onclick="pinInput('6')">6</button>
+      <button class="pin-btn" onclick="pinInput('7')">7</button>
+      <button class="pin-btn" onclick="pinInput('8')">8</button>
+      <button class="pin-btn" onclick="pinInput('9')">9</button>
+      <div></div>
+      <button class="pin-btn" onclick="pinInput('0')">0</button>
+      <button class="pin-del-btn" onclick="pinDelete()"><i class="ti ti-backspace" style="font-size:18px"></i></button>
+    </div>
+    <button class="reset-link" id="pw-reset-link" style="display:none" onclick="useMasterReset()">비밀번호를 잊으셨나요? 마스터로 초기화</button>
+    <button class="pw-modal-cancel" onclick="closePwModal()">취소</button>
+  </div>
+</div>
+
+<script>
+const MASTER='dasom3';
+const NOTION_TOKEN='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';
+const NOTION_DB_ID='371c87312eaf80589af9d15fbfe4b704';
+const PROXY='https://api.allorigins.win/raw?url=';
+
+const AV=[{bg:'#E1F5EE',c:'#085041'},{bg:'#EEEDFE',c:'#3C3489'},{bg:'#FAEEDA',c:'#633806'},{bg:'#FAECE7',c:'#712B13'},{bg:'#EAF3DE',c:'#27500A'}];
+let couples=[];
+let pdata={},changelog={};
+let wOff=0,hOff=0;
+let pendingMemberDelete=null,pendingPrayerDelete=null;
+let debounceTimers={};
+const MAX_LOG=10;
+let pwModalContext=null,pinValue='';
+
+async function notionRequest(endpoint,method,body){
+  const url=`https://api.notion.com/v1/${endpoint}`;
+  const res=await fetch(PROXY+encodeURIComponent(url),{
+    method,
+    headers:{'Content-Type':'application/json','x-origin-headers':JSON.stringify({'Authorization':`Bearer ${NOTION_TOKEN}`,'Notion-Version':'2022-06-28','Content-Type':'application/json'})},
+    body:body?JSON.stringify(body):undefined
+  });
+  return res.json();
+}
+
+async function loadFromNotion(){
+  setSyncText('불러오는 중...');
+  try{
+    const res=await notionRequest(`databases/${NOTION_DB_ID}/query`,'POST',{
+      filter:{property:'Name',title:{equals:'app_data'}},page_size:1
+    });
+    if(!res.results)throw new Error('fail');
+    const page=res.results[0];
+    if(page){
+      const blocks=await notionRequest(`blocks/${page.id}/children`,'GET');
+      let raw='';
+      if(blocks&&blocks.results){
+        blocks.results.forEach(b=>{
+          if(b.type==='paragraph')
+            b.paragraph.rich_text.forEach(t=>{raw+=t.plain_text;});
+        });
+      }
+      if(raw){
+        const d=JSON.parse(raw);
+        couples=d.couples||[];pdata=d.pdata||{};changelog=d.changelog||{};
+      }
+    }
+    if(!couples.length){
+      couples=[
+        {id:1,name:'박준호·최수아 가정',initials:'박·최',isLeader:true,pw:''},
+        {id:2,name:'이태양·김나은 가정',initials:'이·김',isLeader:false,pw:''},
+        {id:3,name:'정민재·오하린 가정',initials:'정·오',isLeader:false,pw:''},
+      ];
+    }
+    setSyncText('Notion 연동됨 ✓');
+  }catch(e){
+    console.error('Notion load error:',e);
+    loadLocal();
+    setSyncText('오프라인 모드 (로컬 저장)');
+  }
+  renderLeaderDisplay();renderCouples();
+}
+
+async function saveToNotion(){
+  setSyncText('저장 중...');
+  try{
+    const data=JSON.stringify({couples,pdata,changelog});
+    const chunks=[];
+    for(let i=0;i<data.length;i+=2000)chunks.push(data.slice(i,i+2000));
+    const blocks=chunks.map(c=>({object:'block',type:'paragraph',paragraph:{rich_text:[{type:'text',text:{content:c}}]}}));
+    const res=await notionRequest(`databases/${NOTION_DB_ID}/query`,'POST',{
+      filter:{property:'Name',title:{equals:'app_data'}},page_size:1
+    });
+    const existing=res.results&&res.results[0];
+    if(existing){
+      const existingBlocks=await notionRequest(`blocks/${existing.id}/children`,'GET');
+      if(existingBlocks&&existingBlocks.results){
+        for(const b of existingBlocks.results){
+          await notionRequest(`blocks/${b.id}`,'DELETE');
+        }
+      }
+      await notionRequest(`blocks/${existing.id}/children`,'PATCH',{children:blocks});
+    }else{
+      const page=await notionRequest('pages','POST',{
+        parent:{database_id:NOTION_DB_ID},
+        properties:{Name:{title:[{text:{content:'app_data'}}]}}
+      });
+      await notionRequest(`blocks/${page.id}/children`,'PATCH',{children:blocks});
+    }
+    saveLocal();
+    setSyncText('저장됨 ✓');
+    setTimeout(()=>setSyncText('Notion 연동됨 ✓'),2000);
+  }catch(e){
+    console.error('Notion save error:',e);
+    saveLocal();
+    setSyncText('로컬에 저장됨');
+  }
+}
+
+function setSyncText(t){const el=document.getElementById('sync-text');if(el)el.textContent=t;}
+function loadLocal(){try{const r=localStorage.getItem('dasom3');if(r){const p=JSON.parse(r);if(p.couples)couples=p.couples;if(p.pdata)pdata=p.pdata;if(p.changelog)changelog=p.changelog;}}catch(e){}}
+function saveLocal(){try{localStorage.setItem('dasom3',JSON.stringify({couples,pdata,changelog}));}catch(e){}}
+
+function wKey(off){const d=new Date();d.setDate(d.getDate()+off*7);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-W${Math.ceil(d.getDate()/7)}`;}
+function wLabel(off){const d=new Date();d.setDate(d.getDate()+off*7);const days=['일','월','화','수','목','금','토'];return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;}
+function weekTitle(off){const d=new Date();d.setDate(d.getDate()+off*7);return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${Math.ceil(d.getDate()/7)}주차`;}
+function tsLabel(ts){const d=new Date(ts);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function getLeaders(){return couples.filter(c=>c.isLeader);}
+
+function renderLeaderDisplay(){
+  const leaders=getLeaders();const el=document.getElementById('leader-display');
+  if(!leaders.length){el.innerHTML='';return;}
+  el.innerHTML=`<i class="ti ti-crown" style="font-size:13px;color:#BA7517"></i><span class="leader-label">리더</span><span class="leader-name">${leaders.map(c=>c.name).join(', ')}</span>`;
+}
+function toggleLeader(id){const c=couples.find(x=>x.id===id);if(!c)return;c.isLeader=!c.isLeader;saveToNotion();renderLeaderDisplay();renderMembers();}
+
+function getE(cid,wk){return(pdata[wk]&&pdata[wk][cid])||[''];}
+function setE(cid,wk,arr){
+  if(!pdata[wk])pdata[wk]={};
+  const prev=JSON.stringify(pdata[wk][cid]||['']);
+  if(prev===JSON.stringify(arr))return;
+  pdata[wk][cid]=arr;
+  const logKey=`${wk}_${cid}`;
+  if(!changelog[logKey])changelog[logKey]=[];
+  changelog[logKey].unshift({ts:Date.now(),entries:arr.slice()});
+  if(changelog[logKey].length>MAX_LOG)changelog[logKey]=changelog[logKey].slice(0,MAX_LOG);
+  saveToNotion();
+}
+
+function showAutosave(cid){const el=document.getElementById(`as-${cid}`);if(!el)return;el.style.display='inline';setTimeout(()=>{el.style.display='none';},1500);}
+function updateE(cid,wk,idx,val){
+  const e=getE(cid,wk).slice();e[idx]=val;
+  if(!pdata[wk])pdata[wk]={};pdata[wk][cid]=e;
+  const key=`${cid}_${wk}_${idx}`;clearTimeout(debounceTimers[key]);
+  debounceTimers[key]=setTimeout(()=>{setE(cid,wk,e);showAutosave(cid);},800);
+}
+function manualSave(cid){const key=wKey(wOff);const e=(pdata[key]&&pdata[key][cid])||[''];setE(cid,key,e);showAutosave(cid);}
+function addE(cid,wk){const e=getE(cid,wk).slice();e.push('');setE(cid,wk,e);renderCouples();}
+
+function pinInput(n){
+  if(pinValue.length>=4)return;
+  pinValue+=n;updateDots();
+  if(pinValue.length===4)setTimeout(()=>{if(pwModalContext)pwModalContext.onSubmit(pinValue);},120);
+}
+function pinDelete(){if(pinValue.length>0){pinValue=pinValue.slice(0,-1);updateDots();document.getElementById('pw-modal-err').textContent='';}}
+function updateDots(){for(let i=0;i<4;i++)document.getElementById(`dot-${i}`).classList.toggle('filled',i<pinValue.length);}
+function showPinErr(msg){document.getElementById('pw-modal-err').textContent=msg;pinValue='';updateDots();}
+
+function openPwModal(context){
+  pwModalContext=context;pinValue='';updateDots();
+  document.getElementById('pw-modal-err').textContent='';
+  document.getElementById('pw-modal-title').textContent=context.title;
+  document.getElementById('pw-modal-sub').textContent=context.sub;
+  document.getElementById('pw-reset-link').style.display=context.showReset?'block':'none';
+  document.getElementById('pw-modal').classList.add('show');
+}
+function closePwModal(){document.getElementById('pw-modal').classList.remove('show');pwModalContext=null;pinValue='';updateDots();}
+
+function useMasterReset(){
+  if(!pwModalContext)return;
+  const savedCtx=pwModalContext;closePwModal();
+  setTimeout(()=>{
+    openPwModal({title:'마스터 비밀번호',sub:'마스터 비밀번호를 입력하면 해당 가정의 비밀번호가 초기화돼요.',showReset:false,
+      onSubmit(val){
+        if(val!==MASTER){showPinErr('마스터 비밀번호가 틀렸어요.');return;}
+        closePwModal();if(savedCtx.onMasterReset)setTimeout(()=>savedCtx.onMasterReset(),150);
+      }
+    });
+  },150);
+}
+
+function setPwForCouple(cid){
+  const c=couples.find(x=>x.id===cid);if(!c)return;
+  if(c.pw){
+    openPwModal({title:'현재 비밀번호 확인',sub:`${c.name}의 현재 4자리 비밀번호를 입력하세요.`,showReset:true,
+      onMasterReset(){setTimeout(()=>setNewPw(cid),150);},
+      onSubmit(val){if(val===c.pw){closePwModal();setTimeout(()=>setNewPw(cid),150);return;}showPinErr('비밀번호가 틀렸어요.');}
+    });
+  }else{setNewPw(cid);}
+}
+function setNewPw(cid){
+  const c=couples.find(x=>x.id===cid);if(!c)return;
+  openPwModal({title:'비밀번호 설정',sub:`${c.name}의 변경 이력용 4자리 숫자를 눌러주세요.`,showReset:false,
+    onSubmit(val){c.pw=val;saveToNotion();closePwModal();renderMembers();}
+  });
+}
+
+function viewHistory(cid,wk){
+  const c=couples.find(x=>x.id===cid);if(!c)return;
+  const logKey=`${wk}_${cid}`;const logs=changelog[logKey]||[];
+  const doOpen=()=>{
+    const el=document.getElementById(`log-${cid}-${wk}`);if(!el)return;
+    if(el.style.display==='block'){el.style.display='none';return;}
+    if(!logs.length){el.innerHTML='<div style="font-size:12px;color:#999;padding:4px 0">변경 이력이 없어요.</div>';el.style.display='block';return;}
+    el.innerHTML=`<div class="hist-log-title"><i class="ti ti-history" style="font-size:12px;vertical-align:-1px"></i> 변경 이력 (최근 ${logs.length}건)</div>`+
+      logs.map((l,i)=>{
+        const filled=l.entries.filter(x=>x.trim());
+        const preview=filled.length?filled.map((x,j)=>`${j+1}. ${esc(x)}`).join('<br>'):'(비어 있음)';
+        return `<div class="log-entry"><div class="log-time">${tsLabel(l.ts)}</div><div class="log-content">${preview}</div><button class="restore-btn" onclick="restoreLog(${cid},'${wk}',${i})"><i class="ti ti-restore" style="font-size:11px;vertical-align:-1px"></i> 이 버전으로 복구</button></div>`;
+      }).join('');
+    el.style.display='block';
+  };
+  if(c.pw){
+    openPwModal({title:`${c.name} 변경 이력`,sub:'4자리 비밀번호를 입력해 주세요.',showReset:true,
+      onMasterReset(){setTimeout(doOpen,150);},
+      onSubmit(val){if(val===c.pw){closePwModal();setTimeout(doOpen,150);return;}showPinErr('비밀번호가 틀렸어요.');}
+    });
+  }else{doOpen();}
+}
+function restoreLog(cid,wk,logIdx){
+  const logKey=`${wk}_${cid}`;const entry=changelog[logKey]&&changelog[logKey][logIdx];
+  if(!entry)return;setE(cid,wk,entry.entries.slice());renderHistory();
+}
+
+function askPrayerDelete(cid,wk,idx){
+  const entries=getE(cid,wk);const txt=entries[idx]&&entries[idx].trim();
+  pendingPrayerDelete={cid,wk,idx};
+  const desc=document.getElementById('prayer-confirm-desc');
+  desc.innerHTML=txt?`<span class="confirm-highlight">"${esc(txt)}"</span> 항목을 삭제할까요?`:'이 빈 항목을 삭제할까요?';
+  const wrap=document.getElementById('prayer-confirm-wrap');
+  const card=document.getElementById(`card-${cid}`);
+  if(card){card.appendChild(wrap);wrap.style.display='block';}
+}
+function cancelPrayerDelete(){pendingPrayerDelete=null;document.getElementById('prayer-confirm-wrap').style.display='none';}
+function confirmPrayerDelete(){
+  if(!pendingPrayerDelete)return;
+  const{cid,wk,idx}=pendingPrayerDelete;pendingPrayerDelete=null;
+  document.getElementById('prayer-confirm-wrap').style.display='none';
+  const e=getE(cid,wk).slice();e.splice(idx,1);setE(cid,wk,e.length?e:['']);renderCouples();
+}
+function askMemberDelete(id){
+  const c=couples.find(x=>x.id===id);if(!c)return;
+  pendingMemberDelete=id;
+  document.getElementById('member-confirm-name').textContent=c.name;
+  document.getElementById('member-confirm').classList.add('show');
+}
+function cancelMemberDelete(){pendingMemberDelete=null;document.getElementById('member-confirm').classList.remove('show');}
+function confirmMemberDelete(){
+  if(!pendingMemberDelete)return;
+  couples=couples.filter(c=>c.id!==pendingMemberDelete);pendingMemberDelete=null;
+  document.getElementById('member-confirm').classList.remove('show');
+  saveToNotion();renderLeaderDisplay();renderMembers();
+}
+
+function buildOneText(c,off){
+  const key=wKey(off);const filled=getE(c.id,key).filter(x=>x.trim());
+  if(!filled.length)return `🙏 ${c.name} 기도제목\n${weekTitle(off)}\n${'─'.repeat(20)}\n  (입력된 기도제목이 없어요)`;
+  return `🙏 ${c.name} 기도제목\n${weekTitle(off)}\n${'─'.repeat(20)}\n${filled.map((x,j)=>`${j+1}. ${x}`).join('\n')}`;
+}
+function buildAllText(off){
+  const key=wKey(off);const leaders=getLeaders();
+  const leaderLine=leaders.length?`리더: ${leaders.map(c=>c.name).join(', ')}\n`:'';
+  const title=`🙏 다솜빛마을 3조 기도제목\n${weekTitle(off)}\n${leaderLine}${'─'.repeat(22)}`;
+  const body=couples.map(c=>{const filled=getE(c.id,key).filter(x=>x.trim());if(!filled.length)return `\n[ ${c.name} ]\n  (미입력)`;return `\n[ ${c.name} ]\n${filled.map((x,j)=>`  ${j+1}. ${x}`).join('\n')}`;}).join('\n');
+  return title+body;
+}
+function toggleOnePanel(cid){
+  const panel=document.getElementById(`sp-${cid}`);if(panel.style.display==='block'){panel.style.display='none';return;}
+  const c=couples.find(x=>x.id===cid);document.getElementById(`sp-pre-${cid}`).textContent=buildOneText(c,wOff);panel.style.display='block';
+}
+function toggleAllPanel(){const p=document.getElementById('all-panel');if(p.style.display==='block'){p.style.display='none';return;}document.getElementById('all-pre').textContent=buildAllText(wOff);p.style.display='block';}
+function toggleHistPanel(){const p=document.getElementById('hist-panel');if(p.style.display==='block'){p.style.display='none';return;}document.getElementById('hist-pre').textContent=buildAllText(hOff);p.style.display='block';}
+function copyPanel(preId,btnId){
+  const txt=document.getElementById(preId).textContent;
+  navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.getElementById(btnId);const orig=btn.innerHTML;
+    btn.innerHTML='<i class="ti ti-check" style="font-size:13px;vertical-align:-1px"></i> 복사 완료!';
+    setTimeout(()=>{btn.innerHTML=orig;},2000);
+  });
+}
+
+function renderCouples(){
+  document.getElementById('wlbl').textContent=wLabel(wOff);
+  const key=wKey(wOff);
+  document.getElementById('couple-list').innerHTML=couples.map((c,i)=>{
+    const av=AV[i%AV.length];const entries=getE(c.id,key);
+    const rows=entries.map((v,j)=>`
+      <div class="pitem">
+        <span class="pnum">${j+1}.</span>
+        <input class="pinput" value="${esc(v)}" placeholder="기도제목을 입력하세요" oninput="updateE(${c.id},'${key}',${j},this.value)">
+        ${entries.length>1?`<button class="pdel" onclick="askPrayerDelete(${c.id},'${key}',${j})"><i class="ti ti-x" style="font-size:13px"></i></button>`:'<span style="width:24px"></span>'}
+      </div>`).join('');
+    const filled=entries.filter(x=>x.trim()).length;
+    const leaderBadge=c.isLeader?`<span style="font-size:11px;background:#E1F5EE;color:#0F6E56;padding:2px 7px;border-radius:20px;margin-left:6px"><i class="ti ti-crown" style="font-size:11px;vertical-align:-1px"></i> 리더</span>`:'';
+    return `<div class="couple-card" id="card-${c.id}">
+      <div class="ch">
+        <div class="ch-left">
+          <div class="av" style="background:${av.bg};color:${av.c}">${c.initials}</div>
+          <div><div class="cname">${c.name}${leaderBadge}</div><div class="cmeta">${filled}개 입력됨</div></div>
+        </div>
+        <span class="autosave-tag" id="as-${c.id}"><i class="ti ti-check" style="font-size:11px;vertical-align:-1px"></i> 저장됨</span>
+      </div>
+      <div>${rows}</div>
+      <button class="padd" onclick="addE(${c.id},'${key}')"><i class="ti ti-plus" style="font-size:12px;vertical-align:-1px"></i> 기도제목 추가</button>
+      <div class="card-footer">
+        <button class="share-one-btn" onclick="toggleOnePanel(${c.id})"><i class="ti ti-send" style="font-size:13px"></i> 공유</button>
+        <button class="sbtn" onclick="manualSave(${c.id})">저장</button>
+      </div>
+      <div class="inline-share" id="sp-${c.id}">
+        <div class="inline-pre" id="sp-pre-${c.id}"></div>
+        <div class="inline-actions">
+          <button class="copy-btn" id="sp-copy-${c.id}" onclick="copyPanel('sp-pre-${c.id}','sp-copy-${c.id}')"><i class="ti ti-copy" style="font-size:13px;vertical-align:-1px"></i> 복사하기</button>
+          <button class="close-sm" onclick="document.getElementById('sp-${c.id}').style.display='none'">닫기</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('all-panel').style.display='none';
+}
+
+function renderHistory(){
+  document.getElementById('hwlbl').textContent=weekTitle(hOff);
+  const key=wKey(hOff);
+  document.getElementById('hist-content').innerHTML=couples.map((c,i)=>{
+    const av=AV[i%AV.length];const filled=getE(c.id,key).filter(x=>x.trim());
+    const logKey=`${key}_${c.id}`;const hasLog=changelog[logKey]&&changelog[logKey].length>0;
+    const lockIcon=c.pw?`<i class="ti ti-lock" style="font-size:11px;vertical-align:-1px;margin-right:3px"></i>`:'';
+    return `<div class="hw-section">
+      <div class="hw-couple-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="av" style="background:${av.bg};color:${av.c};width:28px;height:28px;font-size:10px">${c.initials}</div>
+          <span class="hw-couple-name">${c.name}</span>
+        </div>
+        ${hasLog?`<button class="history-btn" onclick="viewHistory(${c.id},'${key}')">${lockIcon}변경 이력</button>`:''}
+      </div>
+      <div class="hw-prayers">${filled.length?filled.map((x,j)=>`${j+1}. ${esc(x)}`).join('<br>'):'<span style="color:#999">미입력</span>'}</div>
+      <div class="hist-log" id="log-${c.id}-${key}"></div>
+    </div>`;
+  }).join('');
+}
+
+function renderMembers(){
+  document.getElementById('member-list').innerHTML=couples.map((c,i)=>{
+    const av=AV[i%AV.length];const hasPw=!!c.pw;
+    return `<div class="member-row">
+      <div class="mi"><div class="av" style="background:${av.bg};color:${av.c}">${c.initials}</div><span style="font-size:13px;color:var(--color-text-primary)">${c.name}</span></div>
+      <div class="member-actions">
+        <button class="leader-toggle ${c.isLeader?'is-leader':'not-leader'}" onclick="toggleLeader(${c.id})"><i class="ti ti-crown" style="font-size:11px;vertical-align:-1px"></i> ${c.isLeader?'리더':'리더 지정'}</button>
+        <button class="pw-set-btn ${hasPw?'has-pw':''}" onclick="setPwForCouple(${c.id})"><i class="ti ti-${hasPw?'lock':'lock-open'}" style="font-size:11px;vertical-align:-1px"></i> ${hasPw?'비번 변경':'비번 설정'}</button>
+        <button class="delbtn" onclick="askMemberDelete(${c.id})"><i class="ti ti-trash" style="font-size:16px"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getInitials(n){const sep=['·','&',' '].find(s=>n.includes(s));if(sep){const p=n.split(sep);if(p.length>=2)return p[0].trim()[0]+sep+p[1].trim()[0];}return n.slice(0,2);}
+  const name=document.getElementById('new-couple').value.trim();if(!name)return;
+  const initials=getInitials(name);
+  couples.push({id:Date.now(),name,initials,isLeader:false,pw:''});
+  document.getElementById('new-couple').value='';saveToNotion();renderMembers();
+}
+function goTab(name,el){
+  ['write','history','members'].forEach(t=>{document.getElementById(`pg-${t}`).style.display=t===name?'':'none';});
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+  if(name==='history'){hOff=wOff;renderHistory();}
+  if(name==='members')renderMembers();
+}
+function chWeek(d){wOff+=d;renderCouples();}
+function chHWeek(d){hOff+=d;renderHistory();document.getElementById('hist-panel').style.display='none';}
+
+loadFromNotion();
+</script>
+</body>
+</html>
