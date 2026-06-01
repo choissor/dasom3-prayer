@@ -307,6 +307,7 @@ let pendingMemberDelete=null,pendingPrayerDelete=null;
 let debounceTimers={};
 const MAX_LOG=10;
 let pwModalContext=null,pinValue='';
+let notionNeedsRepair=false;
 
 async function notionRequest(endpoint,method,body){
   const res=await fetch(`/api/notion?endpoint=${encodeURIComponent(endpoint)}`,{
@@ -315,6 +316,20 @@ async function notionRequest(endpoint,method,body){
     body:body?JSON.stringify(body):undefined
   });
   return res.json();
+}
+
+async function fetchAllBlocks(pageId){
+  let all=[];let cursor=undefined;
+  for(let i=0;i<20;i++){
+    const ep=cursor
+      ? `blocks/${pageId}/children?page_size=100&start_cursor=${cursor}`
+      : `blocks/${pageId}/children?page_size=100`;
+    const res=await notionRequest(ep,'GET');
+    if(!res.results)break;
+    all=all.concat(res.results);
+    if(res.has_more&&res.next_cursor){cursor=res.next_cursor;}else{break;}
+  }
+  return all;
 }
 
 async function loadFromNotion(){
@@ -330,18 +345,21 @@ async function loadFromNotion(){
     if(!res.results)throw new Error('fail');
     const page=res.results[0];
     if(page){
-      const blocks=await notionRequest(`blocks/${page.id}/children`,'GET');
+      const blockList=await fetchAllBlocks(page.id);
       let raw='';
-      if(blocks&&blocks.results){
-        blocks.results.forEach(b=>{
-          if(b.type==='paragraph')
-            b.paragraph.rich_text.forEach(t=>{raw+=t.plain_text;});
-        });
-      }
+      blockList.forEach(b=>{
+        if(b.type==='paragraph'&&b.paragraph&&b.paragraph.rich_text)
+          b.paragraph.rich_text.forEach(t=>{raw+=t.plain_text;});
+      });
       if(raw){
-        const d=JSON.parse(raw);
-        couples=d.couples||[];pdata=d.pdata||{};changelog=d.changelog||{};
-        saveLocal();
+        try{
+          const d=JSON.parse(raw);
+          couples=d.couples||[];pdata=d.pdata||{};changelog=d.changelog||{};
+          saveLocal();
+        }catch(parseErr){
+          console.error('Notion JSON 손상, 로컬 데이터 사용:',parseErr);
+          notionNeedsRepair=true;
+        }
       }
     }
     if(!couples.length){
@@ -352,6 +370,7 @@ async function loadFromNotion(){
       ];
     }
     setSyncText('Notion 연동됨 ✓');
+    if(notionNeedsRepair){notionNeedsRepair=false;_saveToNotion();}
   }catch(e){
     console.error('Notion load error:',e);
     setSyncText('오프라인 모드 (로컬 저장)');
@@ -365,39 +384,48 @@ function scheduleSave(){
   saveTimer=setTimeout(()=>_saveToNotion(),1500);
 }
 async function saveToNotion(){scheduleSave();}
+
+let saveInProgress=false;
 async function _saveToNotion(){
+  if(saveInProgress){scheduleSave();return;}
+  saveInProgress=true;
   setSyncText('저장 중...');
   try{
+    saveLocal();
     const data=JSON.stringify({couples,pdata,changelog});
     const chunks=[];
-    for(let i=0;i<data.length;i+=2000)chunks.push(data.slice(i,i+2000));
+    for(let i=0;i<data.length;i+=1800)chunks.push(data.slice(i,i+1800));
     const blocks=chunks.map(c=>({object:'block',type:'paragraph',paragraph:{rich_text:[{type:'text',text:{content:c}}]}}));
     const res=await notionRequest(`databases/${NOTION_DB_ID}/query`,'POST',{
       filter:{property:'이름',title:{equals:'app_data'}},page_size:1
     });
+    let pageId;
     const existing=res.results&&res.results[0];
     if(existing){
-      const existingBlocks=await notionRequest(`blocks/${existing.id}/children`,'GET');
-      if(existingBlocks&&existingBlocks.results){
-        for(const b of existingBlocks.results){
-          await notionRequest(`blocks/${b.id}`,'DELETE');
-        }
+      pageId=existing.id;
+      const existingBlocks=await fetchAllBlocks(pageId);
+      for(const b of existingBlocks){
+        try{await notionRequest(`blocks/${b.id}`,'DELETE');}catch(_){}
       }
-      await notionRequest(`blocks/${existing.id}/children`,'PATCH',{children:blocks});
     }else{
       const page=await notionRequest('pages','POST',{
         parent:{database_id:NOTION_DB_ID},
         properties:{'이름':{title:[{text:{content:'app_data'}}]}}
       });
-      await notionRequest(`blocks/${page.id}/children`,'PATCH',{children:blocks});
+      pageId=page.id;
     }
-    saveLocal();
+    for(let i=0;i<blocks.length;i+=100){
+      const slice=blocks.slice(i,i+100);
+      await notionRequest(`blocks/${pageId}/children`,'PATCH',{children:slice});
+    }
     setSyncText('저장됨 ✓');
     setTimeout(()=>setSyncText('Notion 연동됨 ✓'),2000);
   }catch(e){
     console.error('Notion save error:',e);
     saveLocal();
     setSyncText('로컬에 저장됨');
+  }finally{
+    saveInProgress=false;
   }
 }
 
@@ -408,85 +436,56 @@ function saveLocal(){try{localStorage.setItem('dasom3',JSON.stringify({couples,p
 function getSunday(base=new Date()){
   const d=new Date(base);
   const day=d.getDay();
-
-  // 일요일이면 그날을 기준으로, 월~토이면 직전 일요일을 기준으로 사용
-  if(day!==0){
-    d.setDate(d.getDate()-day);
-  }
-
+  if(day!==0){d.setDate(d.getDate()-day);}
   d.setHours(0,0,0,0);
   return d;
 }
-
 function weekKeyFromDate(date){
   const sunday=getSunday(date);
   return `${sunday.getFullYear()}-${String(sunday.getMonth()+1).padStart(2,'0')}-W${Math.ceil(sunday.getDate()/7)}`;
 }
-
 function weekLabelFromDate(date){
   const sunday=getSunday(date);
   const days=['일','월','화','수','목','금','토'];
   return `${sunday.getFullYear()}년 ${sunday.getMonth()+1}월 ${sunday.getDate()}일 (${days[sunday.getDay()]})`;
 }
-
 function weekTitleFromDate(date){
   const sunday=getSunday(date);
   return `${sunday.getFullYear()}년 ${sunday.getMonth()+1}월 ${Math.ceil(sunday.getDate()/7)}주차`;
 }
-
 function sundayByOffset(off){
   const d=getSunday();
   d.setDate(d.getDate()+off*7);
   return d;
 }
-
-function wKey(off){
-  return weekKeyFromDate(sundayByOffset(off));
-}
-
-function wLabel(off){
-  return weekLabelFromDate(sundayByOffset(off));
-}
-
-function weekTitle(off){
-  return weekTitleFromDate(sundayByOffset(off));
-}
+function wKey(off){return weekKeyFromDate(sundayByOffset(off));}
+function wLabel(off){return weekLabelFromDate(sundayByOffset(off));}
+function weekTitle(off){return weekTitleFromDate(sundayByOffset(off));}
 
 function monthDate(off){
-  // 현재 달이 아니라, 현재 적용 중인 '주일'이 속한 달을 기준으로 함
-  // 예: 6월 1일 월요일이라도 직전 주일이 5월 31일이면 5월로 표시
   const base=getSunday();
   base.setMonth(base.getMonth()+off);
   base.setDate(1);
   base.setHours(0,0,0,0);
   return base;
 }
-
 function monthLabel(off){
   const d=monthDate(off);
   return `${d.getFullYear()}년 ${d.getMonth()+1}월`;
 }
-
 function weeksInMonth(off){
   const base=monthDate(off);
   const y=base.getFullYear();
   const m=base.getMonth();
   const last=new Date(y,m+1,0).getDate();
   const arr=[];
-
-  // 해당 월 안에 있는 '일요일'만 주차로 표시
   for(let day=1;day<=last;day++){
     const d=new Date(y,m,day);
     if(d.getDay()===0){
       const week=Math.ceil(day/7);
-      arr.push({
-        key:weekKeyFromDate(d),
-        label:`${m+1}월 ${week}주차`,
-        day
-      });
+      arr.push({key:weekKeyFromDate(d),label:`${m+1}월 ${week}주차`,day});
     }
   }
-
   return arr;
 }
 function tsLabel(ts){const d=new Date(ts);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
@@ -694,14 +693,12 @@ function renderCouples(){
   document.getElementById('all-panel').style.display='none';
 }
 
-
 function renderMonthlyFlow(){
   const lbl=document.getElementById('month-lbl');
   const box=document.getElementById('monthly-flow');
   if(!lbl||!box)return;
   lbl.textContent=monthLabel(mOff);
   const weeks=weeksInMonth(mOff);
-
   box.innerHTML=couples.map((c,i)=>{
     const av=AV[i%AV.length];
     const weekHtml=weeks.map(w=>{
@@ -711,7 +708,6 @@ function renderMonthlyFlow(){
         <div class="flow-week-body">${filled.length?filled.map((x,j)=>`${j+1}. ${esc(x)}`).join('<br>'):'<span style="color:#999">미입력</span>'}</div>
       </div>`;
     }).join('');
-
     return `<div class="flow-card">
       <div class="flow-couple" onclick="toggleMonthlyFlow(${c.id})">
         <div class="flow-couple-name">
@@ -726,17 +722,12 @@ function renderMonthlyFlow(){
     </div>`;
   }).join('');
 }
-
 function toggleMonthlyFlow(cid){
   const el=document.getElementById(`flow-${cid}`);
   if(!el)return;
   el.style.display=el.style.display==='block'?'none':'block';
 }
-
-function chMonth(d){
-  mOff+=d;
-  renderMonthlyFlow();
-}
+function chMonth(d){mOff+=d;renderMonthlyFlow();}
 
 function renderHistory(){
   document.getElementById('hwlbl').textContent=weekTitle(hOff);
@@ -781,7 +772,6 @@ function getInitials(n){
   }
   return n.slice(0,2);
 }
-
 function addCouple(){
   const name=document.getElementById('new-couple').value.trim();
   if(!name) return;
