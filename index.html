@@ -306,6 +306,7 @@ let couples=[];
 let pdata={},changelog={};
 let wOff=0,hOff=0,mOff=0;
 let isSaving=false,lastLocalEdit=0,lastRemoteSync=0;
+let isTyping=false,typingTimer=null;
 let pendingMemberDelete=null,pendingPrayerDelete=null;
 let debounceTimers={};
 const MAX_LOG=10;
@@ -359,10 +360,14 @@ async function readAppDataFromNotion(){
 
 async function refreshFromNotion(silent){
   if(isSaving)return;
-  if(Date.now()-lastLocalEdit<4000){
-    if(!silent)setSyncText('입력 중이라 잠시 후 동기화하세요');
+  const active=document.activeElement;
+  const isEditingInput=active&&active.classList&&active.classList.contains('pinput');
+
+  if(isTyping||isEditingInput||Date.now()-lastLocalEdit<12000){
+    if(!silent)setSyncText('입력 중이라 동기화를 잠시 멈춤');
     return;
   }
+
   if(!silent)setSyncText('동기화 새로고침 중...');
   try{
     const d=await readAppDataFromNotion();
@@ -457,6 +462,12 @@ async function _saveToNotion(){
 }
 
 function setSyncText(t){const el=document.getElementById('sync-text');if(el)el.textContent=t;}
+function markTyping(){
+  isTyping=true;
+  lastLocalEdit=Date.now();
+  clearTimeout(typingTimer);
+  typingTimer=setTimeout(()=>{isTyping=false;},12000);
+}
 function loadLocal(){try{const r=localStorage.getItem('dasom3');if(r){const p=JSON.parse(r);if(p.couples)couples=p.couples;if(p.pdata)pdata=p.pdata;if(p.changelog)changelog=p.changelog;}}catch(e){}}
 function saveLocal(){try{localStorage.setItem('dasom3',JSON.stringify({couples,pdata,changelog}));}catch(e){}}
 
@@ -546,10 +557,11 @@ function setE(cid,wk,arr){
 
 function showAutosave(cid){const el=document.getElementById(`as-${cid}`);if(!el)return;el.style.display='inline';setTimeout(()=>{el.style.display='none';},1500);}
 function updateE(cid,wk,idx,val){
+  markTyping();
   const e=getE(cid,wk).slice();e[idx]=val;
   if(!pdata[wk])pdata[wk]={};pdata[wk][cid]=e;
   const key=`${cid}_${wk}_${idx}`;clearTimeout(debounceTimers[key]);
-  debounceTimers[key]=setTimeout(()=>{setE(cid,wk,e);showAutosave(cid);},800);
+  debounceTimers[key]=setTimeout(()=>{setE(cid,wk,e);showAutosave(cid);},1500);
 }
 function manualSave(cid){const key=wKey(wOff);const e=(pdata[key]&&pdata[key][cid])||[''];setE(cid,key,e);showAutosave(cid);}
 function addE(cid,wk){const e=getE(cid,wk).slice();e.push('');setE(cid,wk,e);renderCouples();}
@@ -695,7 +707,7 @@ function renderCouples(){
     const rows=entries.map((v,j)=>`
       <div class="pitem">
         <span class="pnum">${j+1}.</span>
-        <input class="pinput" value="${esc(v)}" placeholder="기도제목을 입력하세요" oninput="updateE(${c.id},'${key}',${j},this.value)">
+        <input class="pinput" value="${esc(v)}" placeholder="기도제목을 입력하세요" onfocus="markTyping()" oninput="updateE(${c.id},'${key}',${j},this.value)" onblur="isTyping=false;">
         ${entries.length>1?`<button class="pdel" onclick="askPrayerDelete(${c.id},'${key}',${j})"><i class="ti ti-x" style="font-size:13px"></i></button>`:'<span style="width:24px"></span>'}
       </div>`).join('');
     const filled=entries.filter(x=>x.trim()).length;
