@@ -153,7 +153,9 @@ body{font-family:var(--font-sans);background:#f5f5f0;min-height:100vh;display:fl
 .flow-week-body{font-size:12px;color:var(--color-text-secondary);line-height:1.7}
 .flow-empty{font-size:12px;color:var(--color-text-tertiary);padding:4px 0}
 
-.sync-bar{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--color-text-tertiary);padding:6px;border-top:0.5px solid var(--color-border-tertiary);margin-top:1rem}
+.sync-bar{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--color-text-tertiary);padding:6px;border-top:0.5px solid var(--color-border-tertiary);margin-top:1rem;flex-wrap:wrap}
+.sync-refresh-btn{font-size:11px;color:#0F6E56;border:0.5px solid #5DCAA5;background:none;border-radius:20px;padding:3px 8px;cursor:pointer}
+.sync-refresh-btn:hover{background:#E1F5EE}
 </style>
 </head>
 <body>
@@ -191,7 +193,7 @@ body{font-family:var(--font-sans);background:#f5f5f0;min-height:100vh;display:fl
         </div>
       </div>
     </div>
-    <div class="sync-bar" id="sync-bar"><i class="ti ti-cloud" style="font-size:13px"></i> <span id="sync-text">Notion 연동중...</span></div>
+    <div class="sync-bar" id="sync-bar"><i class="ti ti-cloud" style="font-size:13px"></i> <span id="sync-text">Notion 연동중...</span><button class="sync-refresh-btn" onclick="refreshFromNotion(false)">동기화 새로고침</button></div>
   </div>
 
   <div id="pg-history" class="pg" style="display:none">
@@ -210,9 +212,9 @@ body{font-family:var(--font-sans);background:#f5f5f0;min-height:100vh;display:fl
       </div>
       <div class="flow-sub">각 가정의 한 달 기도제목 변화를 주차별로 한눈에 볼 수 있어요.</div>
       <div class="month-bar">
-        <button class="wbtn" type="button" onclick="chMonth(-1);return false;" aria-label="이전 달"><i class="ti ti-chevron-left"></i></button>
+        <button class="wbtn" onclick="chMonth(-1)"><i class="ti ti-chevron-left"></i></button>
         <span class="month-lbl" id="month-lbl"></span>
-        <button class="wbtn" type="button" onclick="chMonth(1);return false;" aria-label="다음 달"><i class="ti ti-chevron-right"></i></button>
+        <button class="wbtn" onclick="chMonth(1)"><i class="ti ti-chevron-right"></i></button>
       </div>
       <div id="monthly-flow"></div>
     </div>
@@ -303,11 +305,11 @@ const AV=[{bg:'#E1F5EE',c:'#085041'},{bg:'#EEEDFE',c:'#3C3489'},{bg:'#FAEEDA',c:
 let couples=[];
 let pdata={},changelog={};
 let wOff=0,hOff=0,mOff=0;
+let isSaving=false,lastLocalEdit=0,lastRemoteSync=0;
 let pendingMemberDelete=null,pendingPrayerDelete=null;
 let debounceTimers={};
 const MAX_LOG=10;
 let pwModalContext=null,pinValue='';
-let notionNeedsRepair=false;
 
 async function notionRequest(endpoint,method,body){
   const res=await fetch(`/api/notion?endpoint=${encodeURIComponent(endpoint)}`,{
@@ -315,52 +317,81 @@ async function notionRequest(endpoint,method,body){
     headers:{'Content-Type':'application/json'},
     body:body?JSON.stringify(body):undefined
   });
-  return res.json();
+  const data=await res.json();
+  if(!res.ok){
+    console.error('Notion API error:',data);
+    throw new Error(data.error||data.message||'Notion API error');
+  }
+  return data;
 }
 
-async function fetchAllBlocks(pageId){
-  let all=[];let cursor=undefined;
-  for(let i=0;i<20;i++){
-    const ep=cursor
-      ? `blocks/${pageId}/children?page_size=100&start_cursor=${cursor}`
-      : `blocks/${pageId}/children?page_size=100`;
-    const res=await notionRequest(ep,'GET');
-    if(!res.results)break;
-    all=all.concat(res.results);
-    if(res.has_more&&res.next_cursor){cursor=res.next_cursor;}else{break;}
+function renderCurrentViews(){
+  renderLeaderDisplay();
+  renderCouples();
+  const historyPage=document.getElementById('pg-history');
+  const membersPage=document.getElementById('pg-members');
+  if(historyPage&&historyPage.style.display!=='none'){
+    renderMonthlyFlow();
+    renderHistory();
   }
-  return all;
+  if(membersPage&&membersPage.style.display!=='none')renderMembers();
+}
+
+async function readAppDataFromNotion(){
+  const res=await notionRequest(`databases/${NOTION_DB_ID}/query`,'POST',{
+    filter:{property:'이름',title:{equals:'app_data'}},page_size:1
+  });
+  const page=res.results&&res.results[0];
+  if(!page)return null;
+
+  const blocks=await notionRequest(`blocks/${page.id}/children`,'GET');
+  let raw='';
+  if(blocks&&blocks.results){
+    blocks.results.forEach(b=>{
+      if(b.type==='paragraph'){
+        b.paragraph.rich_text.forEach(t=>{raw+=t.plain_text;});
+      }
+    });
+  }
+  if(!raw)return null;
+  return JSON.parse(raw);
+}
+
+async function refreshFromNotion(silent){
+  if(isSaving)return;
+  if(Date.now()-lastLocalEdit<4000){
+    if(!silent)setSyncText('입력 중이라 잠시 후 동기화하세요');
+    return;
+  }
+  if(!silent)setSyncText('동기화 새로고침 중...');
+  try{
+    const d=await readAppDataFromNotion();
+    if(d){
+      couples=d.couples||[];
+      pdata=d.pdata||{};
+      changelog=d.changelog||{};
+      saveLocal();
+      renderCurrentViews();
+    }
+    lastRemoteSync=Date.now();
+    setSyncText('Notion 연동됨 ✓');
+  }catch(e){
+    console.error('Notion refresh error:',e);
+    if(!silent)setSyncText('동기화 실패');
+  }
 }
 
 async function loadFromNotion(){
-  // 로컬 먼저 즉시 렌더링
   loadLocal();
   if(couples.length){renderLeaderDisplay();renderCouples();}
   setSyncText('동기화 중...');
-  // Notion은 백그라운드에서 불러옴
   try{
-    const res=await notionRequest(`databases/${NOTION_DB_ID}/query`,'POST',{
-      filter:{property:'이름',title:{equals:'app_data'}},page_size:1
-    });
-    if(!res.results)throw new Error('fail');
-    const page=res.results[0];
-    if(page){
-      const blockList=await fetchAllBlocks(page.id);
-      let raw='';
-      blockList.forEach(b=>{
-        if(b.type==='paragraph'&&b.paragraph&&b.paragraph.rich_text)
-          b.paragraph.rich_text.forEach(t=>{raw+=t.plain_text;});
-      });
-      if(raw){
-        try{
-          const d=JSON.parse(raw);
-          couples=d.couples||[];pdata=d.pdata||{};changelog=d.changelog||{};
-          saveLocal();
-        }catch(parseErr){
-          console.error('Notion JSON 손상, 로컬 데이터 사용:',parseErr);
-          notionNeedsRepair=true;
-        }
-      }
+    const d=await readAppDataFromNotion();
+    if(d){
+      couples=d.couples||[];
+      pdata=d.pdata||{};
+      changelog=d.changelog||{};
+      saveLocal();
     }
     if(!couples.length){
       couples=[
@@ -369,14 +400,15 @@ async function loadFromNotion(){
         {id:3,name:'정민재·오하린 가정',initials:'정·오',isLeader:false,pw:''},
       ];
     }
+    lastRemoteSync=Date.now();
     setSyncText('Notion 연동됨 ✓');
-    if(notionNeedsRepair){notionNeedsRepair=false;_saveToNotion();}
   }catch(e){
     console.error('Notion load error:',e);
     setSyncText('오프라인 모드 (로컬 저장)');
   }
-  renderLeaderDisplay();renderCouples();
+  renderCurrentViews();
 }
+
 
 let saveTimer=null;
 function scheduleSave(){
@@ -384,40 +416,35 @@ function scheduleSave(){
   saveTimer=setTimeout(()=>_saveToNotion(),1500);
 }
 async function saveToNotion(){scheduleSave();}
-
-let saveInProgress=false;
 async function _saveToNotion(){
-  if(saveInProgress){scheduleSave();return;}
-  saveInProgress=true;
+  isSaving=true;
   setSyncText('저장 중...');
   try{
-    saveLocal();
     const data=JSON.stringify({couples,pdata,changelog});
     const chunks=[];
-    for(let i=0;i<data.length;i+=1800)chunks.push(data.slice(i,i+1800));
+    for(let i=0;i<data.length;i+=2000)chunks.push(data.slice(i,i+2000));
     const blocks=chunks.map(c=>({object:'block',type:'paragraph',paragraph:{rich_text:[{type:'text',text:{content:c}}]}}));
     const res=await notionRequest(`databases/${NOTION_DB_ID}/query`,'POST',{
       filter:{property:'이름',title:{equals:'app_data'}},page_size:1
     });
-    let pageId;
     const existing=res.results&&res.results[0];
     if(existing){
-      pageId=existing.id;
-      const existingBlocks=await fetchAllBlocks(pageId);
-      for(const b of existingBlocks){
-        try{await notionRequest(`blocks/${b.id}`,'DELETE');}catch(_){}
+      const existingBlocks=await notionRequest(`blocks/${existing.id}/children`,'GET');
+      if(existingBlocks&&existingBlocks.results){
+        for(const b of existingBlocks.results){
+          await notionRequest(`blocks/${b.id}`,'DELETE');
+        }
       }
+      await notionRequest(`blocks/${existing.id}/children`,'PATCH',{children:blocks});
     }else{
       const page=await notionRequest('pages','POST',{
         parent:{database_id:NOTION_DB_ID},
         properties:{'이름':{title:[{text:{content:'app_data'}}]}}
       });
-      pageId=page.id;
+      await notionRequest(`blocks/${page.id}/children`,'PATCH',{children:blocks});
     }
-    for(let i=0;i<blocks.length;i+=100){
-      const slice=blocks.slice(i,i+100);
-      await notionRequest(`blocks/${pageId}/children`,'PATCH',{children:slice});
-    }
+    saveLocal();
+    lastRemoteSync=Date.now();
     setSyncText('저장됨 ✓');
     setTimeout(()=>setSyncText('Notion 연동됨 ✓'),2000);
   }catch(e){
@@ -425,7 +452,7 @@ async function _saveToNotion(){
     saveLocal();
     setSyncText('로컬에 저장됨');
   }finally{
-    saveInProgress=false;
+    isSaving=false;
   }
 }
 
@@ -435,56 +462,60 @@ function saveLocal(){try{localStorage.setItem('dasom3',JSON.stringify({couples,p
 
 function getSunday(base=new Date()){
   const d=new Date(base);
-  const day=d.getDay();
-  if(day!==0){d.setDate(d.getDate()-day);}
   d.setHours(0,0,0,0);
+  const day=d.getDay();
+  if(day!==0)d.setDate(d.getDate()-day);
   return d;
-}
-function weekKeyFromDate(date){
-  const sunday=getSunday(date);
-  return `${sunday.getFullYear()}-${String(sunday.getMonth()+1).padStart(2,'0')}-W${Math.ceil(sunday.getDate()/7)}`;
-}
-function weekLabelFromDate(date){
-  const sunday=getSunday(date);
-  const days=['일','월','화','수','목','금','토'];
-  return `${sunday.getFullYear()}년 ${sunday.getMonth()+1}월 ${sunday.getDate()}일 (${days[sunday.getDay()]})`;
-}
-function weekTitleFromDate(date){
-  const sunday=getSunday(date);
-  return `${sunday.getFullYear()}년 ${sunday.getMonth()+1}월 ${Math.ceil(sunday.getDate()/7)}주차`;
 }
 function sundayByOffset(off){
   const d=getSunday();
   d.setDate(d.getDate()+off*7);
   return d;
 }
-function wKey(off){return weekKeyFromDate(sundayByOffset(off));}
-function wLabel(off){return weekLabelFromDate(sundayByOffset(off));}
-function weekTitle(off){return weekTitleFromDate(sundayByOffset(off));}
+function sundayWeekNumber(d){
+  const first=new Date(d.getFullYear(),d.getMonth(),1);
+  let firstSunday=new Date(first);
+  const shift=(7-firstSunday.getDay())%7;
+  firstSunday.setDate(firstSunday.getDate()+shift);
+  if(d<firstSunday)return 1;
+  return Math.floor((d-firstSunday)/(7*24*60*60*1000))+1;
+}
+function weekKeyFromSunday(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-W${sundayWeekNumber(d)}`;
+}
+function wKey(off){return weekKeyFromSunday(sundayByOffset(off));}
+function wLabel(off){
+  const d=sundayByOffset(off);
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (일)`;
+}
+function weekTitle(off){
+  const d=sundayByOffset(off);
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${sundayWeekNumber(d)}주차`;
+}
 
 function monthDate(off){
-  const base=getSunday();
-  base.setDate(1);
-  base.setHours(0,0,0,0);
-  base.setMonth(base.getMonth()+off);
-  return base;
+  const d=getSunday();
+  d.setDate(1);
+  d.setMonth(d.getMonth()+off);
+  return d;
 }
-function monthLabel(off){
-  const d=monthDate(off);
-  return `${d.getFullYear()}년 ${d.getMonth()+1}월`;
-}
+function monthLabel(off){const d=monthDate(off);return `${d.getFullYear()}년 ${d.getMonth()+1}월`;}
 function weeksInMonth(off){
   const base=monthDate(off);
   const y=base.getFullYear();
   const m=base.getMonth();
-  const last=new Date(y,m+1,0).getDate();
+  const last=new Date(y,m+1,0);
   const arr=[];
-  for(let day=1;day<=last;day++){
-    const d=new Date(y,m,day);
-    if(d.getDay()===0){
-      const week=Math.ceil(day/7);
-      arr.push({key:weekKeyFromDate(d),label:`${m+1}월 ${week}주차`,day});
-    }
+  let cur=new Date(y,m,1);
+  const shift=(7-cur.getDay())%7;
+  cur.setDate(cur.getDate()+shift);
+  if(cur.getMonth()!==m){
+    cur=new Date(y,m,1);
+  }
+  while(cur<=last){
+    const wk=sundayWeekNumber(cur);
+    arr.push({key:weekKeyFromSunday(cur),label:`${m+1}월 ${wk}주차`,day:cur.getDate()});
+    cur.setDate(cur.getDate()+7);
   }
   return arr;
 }
@@ -497,10 +528,11 @@ function renderLeaderDisplay(){
   if(!leaders.length){el.innerHTML='';return;}
   el.innerHTML=`<i class="ti ti-crown" style="font-size:13px;color:#BA7517"></i><span class="leader-label">리더</span><span class="leader-name">${leaders.map(c=>c.name).join(', ')}</span>`;
 }
-function toggleLeader(id){const c=couples.find(x=>x.id===id);if(!c)return;c.isLeader=!c.isLeader;saveToNotion();renderLeaderDisplay();renderMembers();}
+function toggleLeader(id){const c=couples.find(x=>x.id===id);if(!c)return;lastLocalEdit=Date.now();c.isLeader=!c.isLeader;saveToNotion();renderLeaderDisplay();renderMembers();}
 
 function getE(cid,wk){return(pdata[wk]&&pdata[wk][cid])||[''];}
 function setE(cid,wk,arr){
+  lastLocalEdit=Date.now();
   if(!pdata[wk])pdata[wk]={};
   const prev=JSON.stringify(pdata[wk][cid]||['']);
   if(prev===JSON.stringify(arr))return;
@@ -566,7 +598,7 @@ function setPwForCouple(cid){
 function setNewPw(cid){
   const c=couples.find(x=>x.id===cid);if(!c)return;
   openPwModal({title:'비밀번호 설정',sub:`${c.name}의 변경 이력용 4자리 숫자를 눌러주세요.`,showReset:false,
-    onSubmit(val){c.pw=val;saveToNotion();closePwModal();renderMembers();}
+    onSubmit(val){lastLocalEdit=Date.now();c.pw=val;saveToNotion();closePwModal();renderMembers();}
   });
 }
 
@@ -622,6 +654,7 @@ function askMemberDelete(id){
 function cancelMemberDelete(){pendingMemberDelete=null;document.getElementById('member-confirm').classList.remove('show');}
 function confirmMemberDelete(){
   if(!pendingMemberDelete)return;
+  lastLocalEdit=Date.now();
   couples=couples.filter(c=>c.id!==pendingMemberDelete);pendingMemberDelete=null;
   document.getElementById('member-confirm').classList.remove('show');
   saveToNotion();renderLeaderDisplay();renderMembers();
@@ -693,12 +726,14 @@ function renderCouples(){
   document.getElementById('all-panel').style.display='none';
 }
 
+
 function renderMonthlyFlow(){
   const lbl=document.getElementById('month-lbl');
   const box=document.getElementById('monthly-flow');
   if(!lbl||!box)return;
   lbl.textContent=monthLabel(mOff);
   const weeks=weeksInMonth(mOff);
+
   box.innerHTML=couples.map((c,i)=>{
     const av=AV[i%AV.length];
     const weekHtml=weeks.map(w=>{
@@ -708,6 +743,7 @@ function renderMonthlyFlow(){
         <div class="flow-week-body">${filled.length?filled.map((x,j)=>`${j+1}. ${esc(x)}`).join('<br>'):'<span style="color:#999">미입력</span>'}</div>
       </div>`;
     }).join('');
+
     return `<div class="flow-card">
       <div class="flow-couple" onclick="toggleMonthlyFlow(${c.id})">
         <div class="flow-couple-name">
@@ -722,15 +758,16 @@ function renderMonthlyFlow(){
     </div>`;
   }).join('');
 }
+
 function toggleMonthlyFlow(cid){
   const el=document.getElementById(`flow-${cid}`);
   if(!el)return;
   el.style.display=el.style.display==='block'?'none':'block';
 }
+
 function chMonth(d){
   mOff+=d;
-  try{ renderMonthlyFlow(); }
-  catch(e){ console.error('renderMonthlyFlow error:',e); }
+  renderMonthlyFlow();
 }
 
 function renderHistory(){
@@ -776,11 +813,13 @@ function getInitials(n){
   }
   return n.slice(0,2);
 }
+
 function addCouple(){
   const name=document.getElementById('new-couple').value.trim();
   if(!name) return;
   const initials=getInitials(name);
-  couples.push({id:Date.now(),name,initials,isLeader:false,pw:''}); 
+  lastLocalEdit=Date.now();
+  couples.push({id:Date.now(),name,initials,isLeader:false,pw:''});
   document.getElementById('new-couple').value='';
   saveToNotion();
   renderMembers();
@@ -795,6 +834,9 @@ function chWeek(d){wOff+=d;renderCouples();}
 function chHWeek(d){hOff+=d;renderHistory();document.getElementById('hist-panel').style.display='none';}
 
 loadFromNotion();
+setInterval(()=>{refreshFromNotion(true);},10000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshFromNotion(true);});
+window.addEventListener('focus',()=>refreshFromNotion(true));
 </script>
 </body>
 </html>
