@@ -210,9 +210,9 @@ body{font-family:var(--font-sans);background:#f5f5f0;min-height:100vh;display:fl
       </div>
       <div class="flow-sub">각 가정의 한 달 기도제목 변화를 주차별로 한눈에 볼 수 있어요.</div>
       <div class="month-bar">
-        <button class="wbtn" onclick="chMonth(-1)"><i class="ti ti-chevron-left"></i></button>
+        <button class="wbtn" type="button" onclick="chMonth(-1);return false;" aria-label="이전 달"><i class="ti ti-chevron-left"></i></button>
         <span class="month-lbl" id="month-lbl"></span>
-        <button class="wbtn" onclick="chMonth(1)"><i class="ti ti-chevron-right"></i></button>
+        <button class="wbtn" type="button" onclick="chMonth(1);return false;" aria-label="다음 달"><i class="ti ti-chevron-right"></i></button>
       </div>
       <div id="monthly-flow"></div>
     </div>
@@ -464,9 +464,9 @@ function weekTitle(off){return weekTitleFromDate(sundayByOffset(off));}
 
 function monthDate(off){
   const base=getSunday();
-  base.setMonth(base.getMonth()+off);
   base.setDate(1);
   base.setHours(0,0,0,0);
+  base.setMonth(base.getMonth()+off);
   return base;
 }
 function monthLabel(off){
@@ -727,7 +727,11 @@ function toggleMonthlyFlow(cid){
   if(!el)return;
   el.style.display=el.style.display==='block'?'none':'block';
 }
-function chMonth(d){mOff+=d;renderMonthlyFlow();}
+function chMonth(d){
+  mOff+=d;
+  try{ renderMonthlyFlow(); }
+  catch(e){ console.error('renderMonthlyFlow error:',e); }
+}
 
 function renderHistory(){
   document.getElementById('hwlbl').textContent=weekTitle(hOff);
@@ -776,7 +780,7 @@ function addCouple(){
   const name=document.getElementById('new-couple').value.trim();
   if(!name) return;
   const initials=getInitials(name);
-  couples.push({id:Date.now(),name,initials,isLeader:false,pw:''});
+  couples.push({id:Date.now(),name,initials,isLeader:false,pw:''}); 
   document.getElementById('new-couple').value='';
   saveToNotion();
   renderMembers();
